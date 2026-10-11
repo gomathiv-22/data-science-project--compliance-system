@@ -82,10 +82,27 @@ def create_app():
     upload_folder.mkdir(parents=True, exist_ok=True)
     app.config["UPLOAD_FOLDER"] = str(upload_folder)
 
-    # Enable CORS for frontend dev server
-    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
-    CORS(app, resources={r"/api/*": {"origins": [frontend_url, "http://127.0.0.1:5173", "http://localhost:3000"]}},
-         supports_credentials=True)
+ 
+# Enable CORS for local development and deployed frontend
+frontend_url = os.getenv(
+    "FRONTEND_URL",
+    "https://data-science-project-compliance-sys.vercel.app"
+).rstrip("/")
+
+allowed_origins = [
+    frontend_url,
+    "https://data-science-project-compliance-sys.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+]
+
+CORS(
+    app,
+    resources={r"/api/*": {"origins": allowed_origins}},
+    supports_credentials=True,
+)
+
 
     # Initialize DB and JWT
     init_db(app)
